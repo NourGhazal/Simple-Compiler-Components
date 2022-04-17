@@ -55,3 +55,12 @@ The run function should produce an output of the following format S;A;:
 
 For simplicity the alphabet is considered to be consisting of the binary alphabet only and the start state is always 0.
 # Task 5:
+In this task left recursion elimination was implemented in context free grammar.
+The following convention was used for taking input:
+S,ScT,Sa,T,b;T,aSb,iaLb,i;L,SdL,S 
+
+- Every set of rules is separated using ";" 
+- Each rule within the set is separated using ","
+# Task 6:
+
+
