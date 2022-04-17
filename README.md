@@ -62,5 +62,10 @@ S,ScT,Sa,T,b;T,aSb,iaLb,i;L,SdL,S
 - Every set of rules is separated using ";" 
 - Each rule within the set is separated using ","
 # Task 6:
+In this task first and follow detection was implemented in context free grammar.
+The following convention was used for taking input:
+S,ScT,Sa,T,b;T,aSb,iaLb,i;L,SdL,S 
 
+- Every set of rules is separated using ";" 
+- Each rule within the set is separated using ","
 
