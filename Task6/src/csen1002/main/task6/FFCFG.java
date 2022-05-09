@@ -29,6 +29,7 @@ public class FFCFG {
 	HashMap<String,StringBuilder> follows=new HashMap<String,StringBuilder>();
 	ArrayList<String> variables = new ArrayList<String>();
 	HashMap<String,String> rules=new HashMap<String,String>();
+	ArrayList<String> goesToEpsilon = new ArrayList<String>();
 
 	public FFCFG(String description) {
 		
@@ -48,12 +49,17 @@ public class FFCFG {
 //		newDesription.append(x.reverse());
 //		newDesription.append(";");
 		} 
+		for(int i =0 ; i<variables.size();i++) {
+			String var = variables.get(i);
 		
+		if(canGoToEpsilon(rules, var)){
+			goesToEpsilon.add(var);
+		}
+	}
 		for(int i =0 ; i<variables.size();i++) {
 			String var = variables.get(i);
 			String[] ruleSplited = rules.get(var).split(",");
-			computeFirsts(rules,ruleSplited, var);
-
+			computeFirsts(rules,ruleSplited, var,"");
 			
 		}
 		HashMap<String,StringBuilder> copyFollow= new HashMap<String,StringBuilder>();
@@ -64,9 +70,9 @@ public class FFCFG {
 		}
 		String cc ="";
 		for (String key : copyFollow.keySet()) {
-			System.out.println(key+" KEY");
-			System.out.println(copyFollow.get(key) + "VAR");
-			System.out.println(follows.get(key).toString() + "append var foolow");
+//			System.out.println(key+" KEY");
+//			System.out.println(copyFollow.get(key) + "VAR");
+//			System.out.println(follows.get(key).toString() + "append var foolow");
 			StringBuilder toAppendKeys =  copyFollow.get(key);
 			for(int i=0;i<toAppendKeys.length();i++) {
 				follows.get(toAppendKeys.substring(i, i+1)).append(follows.get(key));
@@ -79,7 +85,7 @@ public class FFCFG {
 	
 	
 	
-	public void  computeFirsts(HashMap<String,String> rules,String[] ruleSplited,String var) {
+	public void  computeFirsts(HashMap<String,String> rules,String[] ruleSplited,String var,String from) {
 			for(int j=0;j<ruleSplited.length;j++) {
 				for(int k=0 ; k<ruleSplited[j].length();k++) {
 				String var2 = ruleSplited[j].charAt(k)+"";
@@ -89,17 +95,18 @@ public class FFCFG {
 					break;
 				}
 				else {
-					if(!var2.equals(var)) {
-					computeFirsts(rules,rules.get(var2).split(","), var2);
-					StringBuilder x = firsts.get(var2);
+					if(!var2.equals(var) && !(var2.equals(from))) {
+					computeFirsts(rules,rules.get(var2).split(","), var2,var);
+					StringBuilder x = new StringBuilder(firsts.get(var2).toString());
 					//find epsilons closures from other variables and deleting it if there was preceding terminals
-					int index = x.indexOf("e");
-					if(index>0 && k <ruleSplited[j].length()-1 ) {
+					
+					while(x.indexOf("e")>0  && k <ruleSplited[j].length()-1 ) {
+						int index = x.indexOf("e");
 						x.deleteCharAt(index);
 					}
 					first.append(x);
 					}
-					if(!canGoToEpsilon(rules, var2)) {				
+					if(!canGoToEpsilon2(rules.get(var2)) && !goesToEpsilon.contains(var2)) {				
 						break;
 					}
 				}
@@ -128,7 +135,7 @@ public class FFCFG {
 							String first = firsts.get(var3).toString();
 							System.out.println(first.toString());
 							follows.get(var2).append(first);
-						if(firsts.get(var3).indexOf("e")<0) {
+						if(!(goesToEpsilon.contains(var3) || canGoToEpsilon2(rules.get(var3)))) {
 							break;
 						}
 						else {
@@ -164,7 +171,7 @@ public class FFCFG {
 						else {
 						copyFollow.get(var).append(var2);
 						}
-						System.out.println("I have PUT KEY "+var +" ANDVAL +"+ copyFollow.get(var));
+//						System.out.println("I have PUT KEY "+var +" ANDVAL +"+ copyFollow.get(var));
 						follows.get(var2).append(currentFollow);
 					}
 				}
@@ -185,6 +192,22 @@ public class FFCFG {
 		return false;
 	}
 
+	public Boolean canGoToEpsilon2(String rule) {
+		String [] ruleSplited = rule.split(",");
+		
+		for(String rule2 :ruleSplited) {
+			for(int i=0 ; i<rule2.length();i++) {
+				if(!goesToEpsilon.contains(rule2.charAt(i)+"")){
+					break;
+				}
+				if(i == rule2.length()-1) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
 	public Boolean canGoToEpsilon(HashMap<String,String> rules,String var) {
 		String [] ruleSplited = rules.get(var).split(",");
 		ArrayList<String> toInspect = new ArrayList<String>();
@@ -193,11 +216,12 @@ public class FFCFG {
 				return true;
 			}
 			
-			if(!containsTerminal(rule)) {
-				for(int i =0 ;i < rule.length();i++) {
-					toInspect.add(rule.charAt(i)+"");
-				}
-			}
+			
+//			if(!containsTerminal(rule)) {
+//				for(int i =0 ;i < rule.length();i++) {
+//					toInspect.add(rule.charAt(i)+"");
+//				}
+//			}
 //			Boolean carry=true;
 //			for(String var2: toInspect) {
 //				int index1 = variables.indexOf(var);
@@ -226,7 +250,7 @@ public class FFCFG {
 	public String first() {
 		// return the output like the desired format
 		StringBuilder returnVal = new StringBuilder(""); 
-		 Set<String> keys = firsts.keySet();
+		Set<String> keys = firsts.keySet();
 		for (String key :variables) {
 			String firstValue = firsts.get(key).toString();
 			Set<Character> charSet = new LinkedHashSet<Character>();
