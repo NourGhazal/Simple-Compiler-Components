@@ -69,3 +69,19 @@ S,ScT,Sa,T,b;T,aSb,iaLb,i;L,SdL,S
 - Every set of rules is separated using ";" 
 - Each rule within the set is separated using ","
 
+# Task 7:
+In this task We constructed LL(1) parsing table for context free grammar.
+input convention used is:
+S,zToS,n,e;T,zTo,No;N,n,e#S,z,n,e;T,z,no;N,n,e#S,$;T,o;N,o"
+- Our input is divided to 3 sections :
+  - The set of rules defining our grammar with the same convention in task 6
+  - The first of each variable separated like the rule 
+  - the follow of each variable also separated like the rules
+- The algorithm creates the LL(1) parsing table then uses the table to produce the longest accepted string for a fall-back DFA
+  
+# Task 8:
+In this task antlr Grammar was used to  simulate the following DFA: 
+![DFA](DFA.png?raw=true "DFA")
+
+# Task 9:
+In this task antlr Grammar was used to create a checker that returns true if an input of the form a*c*b* had the same number of a, b and c
