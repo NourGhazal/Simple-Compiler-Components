@@ -59,7 +59,8 @@ public class FFCFG {
 		for(int i =0 ; i<variables.size();i++) {
 			String var = variables.get(i);
 			String[] ruleSplited = rules.get(var).split(",");
-			computeFirsts(rules,ruleSplited, var,"");
+			ArrayList<String> from = new ArrayList<String>();
+			computeFirsts(rules,ruleSplited, var,from);
 			
 		}
 		HashMap<String,StringBuilder> copyFollow= new HashMap<String,StringBuilder>();
@@ -85,7 +86,7 @@ public class FFCFG {
 	
 	
 	
-	public void  computeFirsts(HashMap<String,String> rules,String[] ruleSplited,String var,String from) {
+	public void  computeFirsts(HashMap<String,String> rules,String[] ruleSplited,String var,ArrayList<String> from) {
 			for(int j=0;j<ruleSplited.length;j++) {
 				for(int k=0 ; k<ruleSplited[j].length();k++) {
 				String var2 = ruleSplited[j].charAt(k)+"";
@@ -95,8 +96,9 @@ public class FFCFG {
 					break;
 				}
 				else {
-					if(!var2.equals(var) && !(var2.equals(from))) {
-					computeFirsts(rules,rules.get(var2).split(","), var2,var);
+					if(!var2.equals(var) && !(from.contains(var2))) {
+					from.add(var);
+					computeFirsts(rules,rules.get(var2).split(","), var2,from);
 					StringBuilder x = new StringBuilder(firsts.get(var2).toString());
 					//find epsilons closures from other variables and deleting it if there was preceding terminals
 					
@@ -133,20 +135,19 @@ public class FFCFG {
 						String var3 = varRule.charAt(i+j)+"";
 						if(variables.contains(var3)) {
 							String first = firsts.get(var3).toString();
-							System.out.println(first.toString());
 							follows.get(var2).append(first);
 						if(!(goesToEpsilon.contains(var3) || canGoToEpsilon2(rules.get(var3)))) {
 							break;
 						}
 						else {
 							if(i+j ==varRule.length()-1 ) {
-								follows.get(var2).append(follows.get(var3));
-								if(copyFollow.get(var3)==null)
+								follows.get(var2).append(follows.get(var));
+								if(copyFollow.get(var)==null)
 								{
-								copyFollow.put(var3,new StringBuilder(var2));
+								copyFollow.put(var,new StringBuilder(var2));
 									}
 								else {
-								copyFollow.get(var3).append(var2);
+								copyFollow.get(var).append(var2);
 								}
 								
 							}
